@@ -1,8 +1,5 @@
 const bodyParser = require('body-parser');
 const helper = require('./fetcher');
-const Repo = require('../database');
-const url = require('url');
-const qs = require('querystring');
 
 
 var express = require('express');
