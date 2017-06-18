@@ -1,6 +1,9 @@
 const bodyParser = require('body-parser');
-const fetcher = require('./fetcher');
+const helper = require('./fetcher');
 const Repo = require('../database');
+const url = require('url');
+const qs = require('querystring');
+
 
 var express = require('express');
 
@@ -12,15 +15,13 @@ app.use(express.static(__dirname + '/../client/dist'));
 
 app.get('/repos', function (req, res) {
   // retrieves top 25 repos from db and response it to the client
-  Repo.find().sort({'name': 'asc'}).then(result => {
-    res.send(result.slice(0, 25));
-  });
+  helper.dbLookup(req, res);
 });
 
 app.post('/repos/import', function (req, res) {
   // request from client to fetch new repos
   let query = req.body.query;
-  fetcher(req, res, query);
+  helper.fetchGithub(req, res, query);
 });
 
 var port = 1128;

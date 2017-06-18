@@ -4,7 +4,6 @@ import $ from 'jquery';
 import Search from './components/Search.jsx';
 import RepoList from './components/RepoList.jsx';
 import List from './components/List.jsx';
-import data from '../../data.json';
 
 class App extends React.Component {
   constructor(props) {
@@ -22,9 +21,8 @@ class App extends React.Component {
       url: 'http://127.0.0.1:1128/repos',
       method: 'GET',
       success: (data) => {
-        console.log(data);
-        this.setState({ repos: data });
-        this.currList[''] = data;
+        this.setState({ repos: JSON.parse(data) });
+        this.currList[''] = JSON.parse(data);
       },
       error: () => {
         console.log('Failed');
@@ -56,7 +54,7 @@ class App extends React.Component {
       data: {query: term},
       success: (response) => {
         // upon receiving the repos, change the state of current repos
-        let repos = JSON.parse(response).items;
+        let repos = JSON.parse(response);
         this.setState({ repos: repos });
       },
       error: () => {

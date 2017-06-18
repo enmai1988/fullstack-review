@@ -1,7 +1,15 @@
 const request = require('request');
 const Repo = require('../database');
+const Promise = require('bluebird');
 
-module.exports = fetchGithub = (req, res, query) => {
+exports.dbLookup = (req, res) => {
+  Repo.find().limit(25).sort({'name': 'asc'})
+  .then(result => {
+    res.send(JSON.stringify(result));
+  });
+}
+
+exports.fetchGithub = (req, res, query) => {
   let host = `https://api.github.com/search/repositories?q=user:${query}`;
 
   let options = {
@@ -12,14 +20,20 @@ module.exports = fetchGithub = (req, res, query) => {
   }
 
   request(options, (err, response, body) => {
-    if (err) { console.log(err); }
     let repos = JSON.parse(body).items;
-    repos.forEach(value => {
-      let repo = new Repo(value);
-      repo.save((err, repo) => {
-        if (err) { return console.error(err); }
+    if (!repos) {
+      res.sendStatus(404);
+      return;
+    }
+    Promise.resolve(repos.forEach(repo => {
+      new Repo(repo).save((err, result) => {
+        if (err) { throw err; }
       });
+    })).then(() => {
+      exports.dbLookup(req, res);
+    }).catch(() => {
+      console.log('err');
+      res.sendStatus(500);
     });
-    res.send(body);
   });
 }

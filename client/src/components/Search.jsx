@@ -3,10 +3,12 @@ import React from 'react';
 class Search extends React.Component {
   constructor(props) {
     super(props);
+    this.input = '';
   }
 
   onChange(e) {
-    this.props.onChange(e.target.value);
+    this.input = e.target.value;
+    this.props.onChange(this.input);
   }
 
   search() {
